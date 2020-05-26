@@ -163,17 +163,31 @@ calculate:
       idiv  bx
         
       add   ax, lowRange
-      jo    exception 
+      jo    exception     
+      push  ax
+      cmp   dx,0
+      je   finish
       
+      mov   ax,bx 
+      mov   bx,dx 
+      mov   dx,0
+      div   bx
+      cmp   ax, 2
+      jg    finish
+      pop   ax
+      inc   ax
+      push  ax
       
-      pop bx
+finish: 
+      pop   ax
+      pop   bx
       push  ax
       call  to_string
        
-      lea     dx, CrLf
-      call    print 
-      lea     dx, buffer+2
-      call    print 
+      lea   dx, CrLf
+      call  print 
+      lea   dx, buffer+2
+      call  print 
       
       add   bx,2 
       loop calculate 
