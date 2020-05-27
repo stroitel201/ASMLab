@@ -255,100 +255,87 @@ to_string proc
     
     
 parse proc
-        push    bp
+       push    bp
         mov     bp, sp
         push    ax
         push    bx
         push    cx
-        push    si 
-        
+        push    si
+       
         mov     dx, 0    
         push    dx
-
+ 
         xor     ax, ax
         mov     bx, 0
-        
+       
         mov     cx, 0
         mov     cl, [buffer+1]
-        
+       
         lea     si, buffer+2  
-        
-        cld 
+       
+        cld
                
         lodsb  
-        dec     si 
-        cmp     al, 2Dh         
+        dec     si
+        cmp     al, 2Dh        
         jne     For
         inc     si
         dec     cl  
         pop     dx
         mov     dl, 1
         push    dx
-        
-    
+       
+   
     For:
-        lodsb   
+        lodsb  
         sub     al, '0'  
         cmp     al, 10
-        jge     exception
-        cmp     al, 0
-        jl      exception  
-        
+        jge     exception  
+       
         push    ax
         mov     ax, bx
         mov     bx, 10
-        mul     bx 
-        
+        mul     bx
+       
         cmp     dx, 0
         jne     exception
-        
+       
         mov     bx, ax
         pop     ax
         add     bx, ax
-        
-        jo      border_check
-        jmp     next
-        
-    border_check:
-        cmp     bx, 8000h
-        je      sign_chek
-        jne     exception
-            
-    sign_chek:
-        pop     dx
-        cmp     dl,0  
-        push    dx
-        je      exception
-        jmp     next 
-           
-        
-    next:
+       
+        push    bx
+        and     bh, 80h
+        cmp     bh, 0
+        jne     exception  
+        pop     bx
+       
         loop    For
                      
         pop     dx
         cmp     dl, 0
         jnz     negative
-        
-        mov     [bp+4], bx 
+       
+        mov     [bp+4], bx
         jmp     end_function
-        
-    negative:     
+       
+    negative:    
         sub     bx, 1
         not     bx
-        mov     [bp+4], bx 
+        mov     [bp+4], bx
         jmp     end_function
-        
+       
     exception:
         lea     dx, error
         call    print    
         jmp     exit
-    end_function:       
+    end_function:      
         pop     si
         pop     cx
         pop     bx
         pop     ax
         pop     bp
-        
+       
         ret
     parse endp
         
