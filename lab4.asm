@@ -25,6 +25,11 @@
     wordOver            db "GAME OVER"
     wordStart           db "TETRIS GAME"
     wordPowered         db "Powered by ASM"
+    wordLevel           db "Level:"
+    Level1              db "Chicken"
+    Level2              db "Casual"   
+    Level3              db "Profi" 
+    Level4              db "Veteran"
     score               dw 0
     delay               dw 4
     incrementSpeedFlag      db 0
@@ -247,13 +252,133 @@ InitialDraw proc
 		add     si, 2
 		cmp     si,cx
 		jne     RenderIteration
-    
+
+    mov     di, offset wordLevel    ;printing word score
+	push    cx
+    mov     cx, 2308
+    mov     si, cx
+    add     cx, 12
+
+    RenderIteration2:
+		xor     bx, bx
+		mov     bl, byte ptr [di]
+		mov     bh, scoreAttr
+		mov     word ptr es:[si], bx
+		inc     di
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIteration2
+    call    printLevel
     pop     cx
     pop     di
     pop     si
     pop     bx
     
     ret
+endp
+
+printLevel proc
+    pusha
+
+    mov     cx, 2320
+    mov     si, cx
+    add     cx, 14
+
+    RenderIterationLvl0:
+		xor     bx, bx
+		mov     bx, word ptr blackSymbol
+		mov     word ptr es:[si], bx
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIterationLvl0
+
+    cmp     delay, 4
+    je      LevelPrint1
+    cmp     delay, 3
+    je      LevelPrint2
+    cmp     delay, 2
+    je      LevelPrint3
+    cmp     delay, 1
+    je      LevelPrint4
+    LevelPrint1:
+        mov     di, offset Level1    ;printing word score
+	    push    cx
+        mov     cx, 2320
+        mov     si, cx
+        add     cx, 14
+
+    RenderIterationLvl1:
+		xor     bx, bx
+		mov     bl, byte ptr [di]
+		mov     bh, scoreAttr
+		mov     word ptr es:[si], bx
+		inc     di
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIterationLvl1
+        pop     cx
+        popa
+        ret
+
+    LevelPrint2:
+        mov     di, offset Level2    ;printing word score
+	    push    cx
+        mov     cx, 2320
+        mov     si, cx
+        add     cx, 12
+
+    RenderIterationLvl2:
+		xor     bx, bx
+		mov     bl, byte ptr [di]
+		mov     bh, scoreAttr
+		mov     word ptr es:[si], bx
+		inc     di
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIterationLvl2
+         pop     cx
+        popa
+        ret
+
+    LevelPrint3:
+        mov     di, offset Level3    ;printing word score
+	    push    cx
+        mov     cx, 2320
+        mov     si, cx
+        add     cx, 10
+
+    RenderIterationLvl3:
+		xor     bx, bx
+		mov     bl, byte ptr [di]
+		mov     bh, scoreAttr
+		mov     word ptr es:[si], bx
+		inc     di
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIterationLvl3
+         pop     cx
+        popa
+        ret
+
+    LevelPrint4:
+        mov     di, offset Level4    ;printing word score
+	    push    cx
+        mov     cx, 2320
+        mov     si, cx
+        add     cx, 14
+
+    RenderIterationLvl4:
+		xor     bx, bx
+		mov     bl, byte ptr [di]
+		mov     bh, scoreAttr
+		mov     word ptr es:[si], bx
+		inc     di
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIterationLvl4
+         pop     cx
+        popa
+        ret
 endp
 
 toString proc
@@ -946,13 +1071,14 @@ BaseCycle proc
     mov     ah, 0               ;get timer count
     int     1Ah                 ;dx - lower byte
     call    printScore
+    
     cmp     incrementSpeedFlag, 1   
     jne     frameRender
     cmp     delay, 1            ;min value
     je      frameRender
     dec     delay               ;increment speed
     dec     incrementSpeedFlag      
-
+    call    printLevel
     frameRender:
         xor     cx, cx
 	    cmp     dx, startTime   ;if not enough time
@@ -1033,7 +1159,7 @@ start proc
 
 
     call    InitialDraw
-
+    
     BaseCycleLoop:
         call    BaseCycle
         jmp     BaseCycleLoop
