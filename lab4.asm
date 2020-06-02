@@ -23,10 +23,15 @@
     stringScore         db "00000"
     wordScore           db "Score:"
     wordOver            db "GAME OVER"
+    wordStart           db "TETRIS GAME"
+    wordPowered         db "Powered by ASM"
     score               dw 0
     delay               dw 4
     incrementSpeedFlag      db 0
+    startAttr       equ 10001111b
+    powerAttr       equ 10001100b
     scoreAttr      equ 00000111b
+    overAttr        equ 00000100b
     base                dw 10
     randomNum        dw 0
     currentBlockModel   dw 3
@@ -978,8 +983,55 @@ endp
 
 start proc
 
-
+    
     call    StartState  
+     
+    CommandDrawBlocks    0, 0, 30, 25, blackSymbol
+        mov     di, offset wordStart    ;printing word start
+	    push    cx
+        mov     cx, 1940
+        mov     si, cx
+        add     cx, 22
+
+    RenderIterationStart:
+
+		xor     bx, bx
+		mov     bl, byte ptr [di]
+		mov     bh, startAttr
+		mov     word ptr es:[si], bx
+		inc     di
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIterationStart
+        
+        mov     di, offset wordPowered    ;printing word start
+	    push    cx
+        mov     cx, 2096
+        mov     si, cx
+        add     cx, 28
+
+    RenderIterationStart2:
+
+		xor     bx, bx
+		mov     bl, byte ptr [di]
+		mov     bh, powerAttr
+		mov     word ptr es:[si], bx
+		inc     di
+		add     si, 2
+		cmp     si,cx
+		jne     RenderIterationStart2
+
+
+
+    keyWaitStart:
+    
+        xor     ax,ax
+        mov     ah, 1 	;check for key pressed
+        int     16h 	;keyboard interrupt
+        jz      keyWaitStart 	;if zf=1 - key not pressed
+
+
+
     call    InitialDraw
 
     BaseCycleLoop:
@@ -999,7 +1051,7 @@ start proc
 
 		xor     bx, bx
 		mov     bl, byte ptr [di]
-		mov     bh, scoreAttr
+		mov     bh, overAttr
 		mov     word ptr es:[si], bx
 		inc     di
 		add     si, 2
