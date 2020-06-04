@@ -26,7 +26,7 @@ reading_val db SIZE_TO_READ dup('$')
 file_read_position dd 0  
 
 file_write_position dd 0
-debug db 'sosat$'                 
+          
 .stack 100h
 
 .code
