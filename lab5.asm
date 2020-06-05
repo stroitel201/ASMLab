@@ -243,9 +243,9 @@ start:
     mov ax, @data
     mov ds, ax
     
-    mov bl, es:[80h]    ;args line length 
-    add bx, 80h         ;args line last    
-    mov si, 82h         ;args line start
+    mov bl, es:[80h]    ;args length 
+    add bx, 80h         ;args last    
+    mov si, 82h         ;args start
     mov di, offset cmd_file_name
     
     cmp si, bx
@@ -278,7 +278,8 @@ start:
         inc deleteWordSize
         xor ch, ch
         loop wordparseloop
-
+    cmp deleteWordSize,50
+    ja  wrong_args
     call manage_file
     
     done:
